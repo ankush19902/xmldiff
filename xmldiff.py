@@ -30,14 +30,14 @@ if len(sys.argv) != 4:
 #
 # Prepares the location of the temporary file that will be created by xmldiff
 def createFileObj(prefix, name):
-    return { 
+    return {
         "filename" : os.path.abspath(name),
         "tmpfilename" : "." + prefix + "." + os.path.basename(name)
     }
 
 
 #
-# Function to sort XML elements by id 
+# Function to sort XML elements by id
 #  (where the elements have an 'id' attribute that can be cast to an int)
 def sortbyid(elem):
     id = elem.get('id')
@@ -61,7 +61,7 @@ def sortbytext(elem):
 
 #
 # Function to sort XML attributes alphabetically by key
-#  The original item is left unmodified, and it's attributes are 
+#  The original item is left unmodified, and it's attributes are
 #  copied to the provided sorteditem
 def sortAttrs(item, sorteditem):
     attrkeys = sorted(item.keys())
@@ -69,19 +69,19 @@ def sortAttrs(item, sorteditem):
         sorteditem.set(key, item.get(key))
 
 
-# 
+#
 # Function to sort XML elements
 #  The sorted elements will be added as children of the provided newroot
 #  This is a recursive function, and will be called on each of the children
 #  of items.
 def sortElements(items, newroot):
     # The intended sort order is to sort by XML element name
-    #  If more than one element has the same name, we want to 
+    #  If more than one element has the same name, we want to
     #   sort by their text contents.
-    #  If more than one element has the same name and they do 
-    #   not contain any text contents, we want to sort by the 
+    #  If more than one element has the same name and they do
+    #   not contain any text contents, we want to sort by the
     #   value of their ID attribute.
-    #  If more than one element has the same name, but has 
+    #  If more than one element has the same name, but has
     #   no text contents or ID attribute, their order is left
     #   unmodified.
     #
@@ -92,7 +92,7 @@ def sortElements(items, newroot):
 
     # Once sorted, we sort each of the items
     for item in items:
-        # Create a new item to represent the sorted version 
+        # Create a new item to represent the sorted version
         #  of the next item, and copy the tag name and contents
         newitem = le.Element(item.tag)
         if item.text and item.text.isspace() == False:
@@ -108,17 +108,17 @@ def sortElements(items, newroot):
         newroot.append(newitem)
 
 
-# 
+#
 # Function to sort the provided XML file
 #  fileobj.filename will be left untouched
-#  A new sorted copy of it will be created at fileobj.tmpfilename 
+#  A new sorted copy of it will be created at fileobj.tmpfilename
 def sortFile(fileobj):
     with open(fileobj['filename'], 'r') as original:
         # parse the XML file and get a pointer to the top
         xmldoc = le.parse(original)
         xmlroot = xmldoc.getroot()
 
-        # create a new XML element that will be the top of 
+        # create a new XML element that will be the top of
         #  the sorted copy of the XML file
         newxmlroot = le.Element(xmlroot.tag)
 
