@@ -137,14 +137,15 @@ if __name__ == '__main__':
     if platform.system() == "Windows":
         cmd = ' '.join(
             (args.diffcommand, filefrom["tmpfilename"], fileto["tmpfilename"]))
-        sp = subprocess.Popen(["cmd", "/c", cmd])
-        sp.communicate()
+        popen_args = ["cmd", "/c", cmd]
     else:
         cmd = ' '.join(
             (args.diffcommand, os.path.abspath(filefrom['tmpfilename']),
              os.path.abspath(fileto['tmpfilename'])))
-        sp = subprocess.Popen(["/bin/bash", "-i", "-c", cmd])
-        sp.communicate()
+        popen_args = ["/bin/bash", "-i", "-c", cmd]
+
+    sp = subprocess.Popen(popen_args)
+    sp.communicate()
 
     # Cleanup - delete the temporary sorted files after the diff terminates
     os.remove(filefrom['tmpfilename'])
