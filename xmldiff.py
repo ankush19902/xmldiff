@@ -20,12 +20,6 @@ import lxml.etree as le
 
 __author__ = 'Dale Lane <email@dalelane.co.uk>'
 
-#
-# Check required arguments
-if len(sys.argv) != 4:
-    print ("Usage: python xmldiff.py <diffcommand> <filename1> <filename2>")
-    quit()
-
 
 def create_file_obj(prefix, name):
     """Prepare the location of the temporary file for 'xmldiff'."""
@@ -128,29 +122,31 @@ def sort_file(fileobj):
         with open(fileobj['tmpfilename'], 'wb') as newfile:
             newtree.write(newfile, pretty_print=True)
 
+if __name__ == '__main__':
+    # Check required arguments
+    if len(sys.argv) != 4:
+        print ("Usage: python xmldiff.py <diffcommand> <filename1> <filename2>")
+        quit()
 
-#
-# sort each of the specified files
-filefrom = create_file_obj("from", sys.argv[2])
-sort_file(filefrom)
-fileto = create_file_obj("to", sys.argv[3])
-sort_file(fileto)
+    # Sort each of the specified files
+    filefrom = create_file_obj("from", sys.argv[2])
+    sort_file(filefrom)
+    fileto = create_file_obj("to", sys.argv[3])
+    sort_file(fileto)
 
-#
-# invoke the requested diff command to compare the two sorted files
-if platform.system() == "Windows":
-    cmd = ' '.join(
-        (sys.argv[1], filefrom["tmpfilename"], fileto["tmpfilename"]))
-    sp = subprocess.Popen(["cmd", "/c", cmd])
-    sp.communicate()
-else:
-    cmd = ' '.join(
-        (sys.argv[1], os.path.abspath(filefrom['tmpfilename']),
-         os.path.abspath(fileto['tmpfilename'])))
-    sp = subprocess.Popen(["/bin/bash", "-i", "-c", cmd])
-    sp.communicate()
+    # Invoke the requested diff command to compare the two sorted files
+    if platform.system() == "Windows":
+        cmd = ' '.join(
+            (sys.argv[1], filefrom["tmpfilename"], fileto["tmpfilename"]))
+        sp = subprocess.Popen(["cmd", "/c", cmd])
+        sp.communicate()
+    else:
+        cmd = ' '.join(
+            (sys.argv[1], os.path.abspath(filefrom['tmpfilename']),
+             os.path.abspath(fileto['tmpfilename'])))
+        sp = subprocess.Popen(["/bin/bash", "-i", "-c", cmd])
+        sp.communicate()
 
-#
-# cleanup - delete the temporary sorted files after the diff terminates
-os.remove(filefrom['tmpfilename'])
-os.remove(fileto['tmpfilename'])
+    # Cleanup - delete the temporary sorted files after the diff terminates
+    os.remove(filefrom['tmpfilename'])
+    os.remove(fileto['tmpfilename'])
