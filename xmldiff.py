@@ -27,19 +27,16 @@ if len(sys.argv) != 4:
     quit()
 
 
-#
-# Prepares the location of the temporary file that will be created by xmldiff
 def create_file_obj(prefix, name):
+    """Prepare the location of the temporary file for 'xmldiff'."""
     return {
         "filename": os.path.abspath(name),
         "tmpfilename": "." + prefix + "." + os.path.basename(name)
     }
 
 
-#
-# Function to sort XML elements by id
-#  (where the elements have an 'id' attribute that can be cast to an int)
 def sort_by_id(elem):
+    """Sort elements by ID if the 'id' attribute can be cast to an int."""
     id = elem.get('id')
     if id:
         try:
@@ -49,9 +46,8 @@ def sort_by_id(elem):
     return 0
 
 
-#
-# Function to sort XML elements by their text contents
 def sort_by_text(elem):
+    """Sort XML elements by their text contents."""
     text = elem.text
     if text:
         return text
@@ -59,41 +55,41 @@ def sort_by_text(elem):
         return ''
 
 
-#
-# Function to sort XML attributes alphabetically by key
-#  The original item is left unmodified, and it's attributes are
-#  copied to the provided sorteditem
 def sort_attrs(item, sorteditem):
+    """Sort XML attributes alphabetically by key.
+
+    The original item is left unmodified and its attributes are copied to the
+    provided `sorteditem`.
+    """
     attrkeys = sorted(item.keys())
     for key in attrkeys:
         sorteditem.set(key, item.get(key))
 
 
-#
-# Function to sort XML elements
-#  The sorted elements will be added as children of the provided newroot
-#  This is a recursive function, and will be called on each of the children
-#  of items.
 def sort_elements(items, newroot):
-    # The intended sort order is to sort by XML element name
-    #  If more than one element has the same name, we want to
-    #   sort by their text contents.
-    #  If more than one element has the same name and they do
-    #   not contain any text contents, we want to sort by the
-    #   value of their ID attribute.
-    #  If more than one element has the same name, but has
-    #   no text contents or ID attribute, their order is left
-    #   unmodified.
-    #
-    # We do this by performing three sorts in the reverse order
+    """Sort XML elements.
+
+    The sorted elements will be added as children of the provided `newroot`.
+    This is a recursive function, and will be called on each of the children of
+    `items`.
+
+    The intended sort order is to sort by XML element name.
+    If more than one element has the same name, we want to sort by their text
+    contents.
+    If more than one element has the same name and they do not contain any text
+    contents, we want to sort by the value of their ID attribute.
+    If more than one element has the same name, but has no text contents or ID
+    attribute, their order is left unmodified.
+    We do this by performing three sorts in the reverse order.
+    """
     items = sorted(items, key=sort_by_id)
     items = sorted(items, key=sort_by_text)
     items = sorted(items, key=attrgetter('tag'))
 
     # Once sorted, we sort each of the items
     for item in items:
-        # Create a new item to represent the sorted version
-        #  of the next item, and copy the tag name and contents
+        # Create a new item to represent the sorted version of the next item,
+        # and copy the tag name and contents
         newitem = le.Element(item.tag)
         if item.text and item.text.isspace() is False:
             newitem.text = item.text
@@ -108,11 +104,12 @@ def sort_elements(items, newroot):
         newroot.append(newitem)
 
 
-#
-# Function to sort the provided XML file
-#  fileobj.filename will be left untouched
-#  A new sorted copy of it will be created at fileobj.tmpfilename
 def sort_file(fileobj):
+    """Sort the provided XML file.
+
+    `fileobj.filename` will be left untouched. A new sorted copy of it will be
+    created at `fileobj.tmpfilename`.
+    """
     with open(fileobj['filename'], 'r') as original:
         # parse the XML file and get a pointer to the top
         xmldoc = le.parse(original)
