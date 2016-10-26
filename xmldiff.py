@@ -31,8 +31,8 @@ if len(sys.argv) != 4:
 # Prepares the location of the temporary file that will be created by xmldiff
 def create_file_obj(prefix, name):
     return {
-        "filename" : os.path.abspath(name),
-        "tmpfilename" : "." + prefix + "." + os.path.basename(name)
+        "filename": os.path.abspath(name),
+        "tmpfilename": "." + prefix + "." + os.path.basename(name)
     }
 
 
@@ -95,7 +95,7 @@ def sort_elements(items, newroot):
         # Create a new item to represent the sorted version
         #  of the next item, and copy the tag name and contents
         newitem = le.Element(item.tag)
-        if item.text and item.text.isspace() == False:
+        if item.text and item.text.isspace() is False:
             newitem.text = item.text
 
         # Copy the attributes (sorted by key) to the new item
@@ -142,10 +142,15 @@ sort_file(fileto)
 #
 # invoke the requested diff command to compare the two sorted files
 if platform.system() == "Windows":
-    sp = subprocess.Popen([ "cmd", "/c", sys.argv[1] + " " + filefrom['tmpfilename'] + " " + fileto['tmpfilename'] ])
+    cmd = ' '.join(
+        (sys.argv[1], filefrom["tmpfilename"], fileto["tmpfilename"]))
+    sp = subprocess.Popen(["cmd", "/c", cmd])
     sp.communicate()
 else:
-    sp = subprocess.Popen([ "/bin/bash", "-i", "-c", sys.argv[1] + " " + os.path.abspath(filefrom['tmpfilename']) + " " + os.path.abspath(fileto['tmpfilename']) ])
+    cmd = ' '.join(
+        (sys.argv[1], os.path.abspath(filefrom['tmpfilename']),
+         os.path.abspath(fileto['tmpfilename'])))
+    sp = subprocess.Popen(["/bin/bash", "-i", "-c", cmd])
     sp.communicate()
 
 #
