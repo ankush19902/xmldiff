@@ -1,32 +1,20 @@
-##########################################################################
-#
-#  xmldiff
-#
-#    Simple utility script to enable a diff of two XML files in a way 
-#     that ignores the order or attributes and elements.
-#
-#    Dale Lane (email@dalelane.co.uk)
-#     6 Oct 2014
-#
-##########################################################################
-#
-#  Overview
-#    The approach is to sort both files by attribute and element, and 
-#     then reuse an existing diff implementation on the sorted files.
-#
-#  Arguments
-#    <diffcommand> the command that should be run to diff the sorted files
-#    <filename1>   the first XML file to diff
-#    <filename2>   the second XML file to diff
-#
-#  Background
-#    http://dalelane.co.uk/blog/?p=3225
-#
-##########################################################################
+"""Diff XML files ignoring the order of attributes and elements.
 
+The approach is to sort both files by attribute and element, and then reuse an
+existing diff implementation on the sorted files.
+
+Arguments
+  <diffcommand> the command that should be run to diff the sorted files
+  <filename1>   the first XML file to diff
+  <filename2>   the second XML file to diff
+
+Background: http://dalelane.co.uk/blog/?p=3225
+"""
 import os, sys, subprocess, platform
 import lxml.etree as le
 from operator import attrgetter
+
+__author__ = 'Dale Lane <email@dalelane.co.uk>'
 
 #
 # Check required arguments
