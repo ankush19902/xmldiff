@@ -3,17 +3,12 @@
 The approach is to sort both files by attribute and element, and then reuse an
 existing diff implementation on the sorted files.
 
-Arguments
-  <diffcommand> the command that should be run to diff the sorted files
-  <filename1>   the first XML file to diff
-  <filename2>   the second XML file to diff
-
 Background: http://dalelane.co.uk/blog/?p=3225
 """
+import argparse
 import os
 import platform
 import subprocess
-import sys
 from operator import attrgetter
 
 import lxml.etree as le
@@ -124,25 +119,29 @@ def sort_file(fileobj):
 
 if __name__ == '__main__':
     # Check required arguments
-    if len(sys.argv) != 4:
-        print ("Usage: python xmldiff.py <diffcommand> <filename1> <filename2>")
-        quit()
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        'diffcommand',
+        help='the command that should be run to diff the sorted files')
+    parser.add_argument('filename1', help='the first XML file to diff')
+    parser.add_argument('filename2', help='the second XML file to diff')
+    args = parser.parse_args()
 
     # Sort each of the specified files
-    filefrom = create_file_obj("from", sys.argv[2])
+    filefrom = create_file_obj("from", args.filename1)
     sort_file(filefrom)
-    fileto = create_file_obj("to", sys.argv[3])
+    fileto = create_file_obj("to", args.filename2)
     sort_file(fileto)
 
     # Invoke the requested diff command to compare the two sorted files
     if platform.system() == "Windows":
         cmd = ' '.join(
-            (sys.argv[1], filefrom["tmpfilename"], fileto["tmpfilename"]))
+            (args.diffcommand, filefrom["tmpfilename"], fileto["tmpfilename"]))
         sp = subprocess.Popen(["cmd", "/c", cmd])
         sp.communicate()
     else:
         cmd = ' '.join(
-            (sys.argv[1], os.path.abspath(filefrom['tmpfilename']),
+            (args.diffcommand, os.path.abspath(filefrom['tmpfilename']),
              os.path.abspath(fileto['tmpfilename'])))
         sp = subprocess.Popen(["/bin/bash", "-i", "-c", cmd])
         sp.communicate()
