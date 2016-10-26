@@ -10,9 +10,13 @@ Arguments
 
 Background: http://dalelane.co.uk/blog/?p=3225
 """
-import os, sys, subprocess, platform
-import lxml.etree as le
+import os
+import platform
+import subprocess
+import sys
 from operator import attrgetter
+
+import lxml.etree as le
 
 __author__ = 'Dale Lane <email@dalelane.co.uk>'
 
