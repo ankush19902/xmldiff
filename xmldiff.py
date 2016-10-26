@@ -111,19 +111,19 @@ def sort_file(fileobj):
     created at `fileobj.tmpfilename`.
     """
     with open(fileobj['filename'], 'r') as original:
-        # parse the XML file and get a pointer to the top
+        # Parse the XML file and get a pointer to the top
         xmldoc = le.parse(original)
         xmlroot = xmldoc.getroot()
 
-        # create a new XML element that will be the top of
-        #  the sorted copy of the XML file
+        # Create a new XML element that will be the top of the sorted copy of
+        # the XML file
         newxmlroot = le.Element(xmlroot.tag)
 
-        # create the sorted copy of the XML file
+        # Create the sorted copy of the XML file
         sort_attrs(xmlroot, newxmlroot)
         sort_elements(list(xmlroot), newxmlroot)
 
-        # write the sorted XML file to the temp file
+        # Write the sorted XML file to the temp file
         newtree = le.ElementTree(newxmlroot)
         with open(fileobj['tmpfilename'], 'wb') as newfile:
             newtree.write(newfile, pretty_print=True)
