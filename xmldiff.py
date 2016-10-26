@@ -29,7 +29,7 @@ if len(sys.argv) != 4:
 
 #
 # Prepares the location of the temporary file that will be created by xmldiff
-def createFileObj(prefix, name):
+def create_file_obj(prefix, name):
     return {
         "filename" : os.path.abspath(name),
         "tmpfilename" : "." + prefix + "." + os.path.basename(name)
@@ -39,7 +39,7 @@ def createFileObj(prefix, name):
 #
 # Function to sort XML elements by id
 #  (where the elements have an 'id' attribute that can be cast to an int)
-def sortbyid(elem):
+def sort_by_id(elem):
     id = elem.get('id')
     if id:
         try:
@@ -51,7 +51,7 @@ def sortbyid(elem):
 
 #
 # Function to sort XML elements by their text contents
-def sortbytext(elem):
+def sort_by_text(elem):
     text = elem.text
     if text:
         return text
@@ -63,7 +63,7 @@ def sortbytext(elem):
 # Function to sort XML attributes alphabetically by key
 #  The original item is left unmodified, and it's attributes are
 #  copied to the provided sorteditem
-def sortAttrs(item, sorteditem):
+def sort_attrs(item, sorteditem):
     attrkeys = sorted(item.keys())
     for key in attrkeys:
         sorteditem.set(key, item.get(key))
@@ -74,7 +74,7 @@ def sortAttrs(item, sorteditem):
 #  The sorted elements will be added as children of the provided newroot
 #  This is a recursive function, and will be called on each of the children
 #  of items.
-def sortElements(items, newroot):
+def sort_elements(items, newroot):
     # The intended sort order is to sort by XML element name
     #  If more than one element has the same name, we want to
     #   sort by their text contents.
@@ -86,8 +86,8 @@ def sortElements(items, newroot):
     #   unmodified.
     #
     # We do this by performing three sorts in the reverse order
-    items = sorted(items, key=sortbyid)
-    items = sorted(items, key=sortbytext)
+    items = sorted(items, key=sort_by_id)
+    items = sorted(items, key=sort_by_text)
     items = sorted(items, key=attrgetter('tag'))
 
     # Once sorted, we sort each of the items
@@ -99,10 +99,10 @@ def sortElements(items, newroot):
             newitem.text = item.text
 
         # Copy the attributes (sorted by key) to the new item
-        sortAttrs(item, newitem)
+        sort_attrs(item, newitem)
 
         # Copy the children of item (sorted) to the new item
-        sortElements(list(item), newitem)
+        sort_elements(list(item), newitem)
 
         # Append this sorted item to the sorted root
         newroot.append(newitem)
@@ -112,7 +112,7 @@ def sortElements(items, newroot):
 # Function to sort the provided XML file
 #  fileobj.filename will be left untouched
 #  A new sorted copy of it will be created at fileobj.tmpfilename
-def sortFile(fileobj):
+def sort_file(fileobj):
     with open(fileobj['filename'], 'r') as original:
         # parse the XML file and get a pointer to the top
         xmldoc = le.parse(original)
@@ -123,8 +123,8 @@ def sortFile(fileobj):
         newxmlroot = le.Element(xmlroot.tag)
 
         # create the sorted copy of the XML file
-        sortAttrs(xmlroot, newxmlroot)
-        sortElements(list(xmlroot), newxmlroot)
+        sort_attrs(xmlroot, newxmlroot)
+        sort_elements(list(xmlroot), newxmlroot)
 
         # write the sorted XML file to the temp file
         newtree = le.ElementTree(newxmlroot)
@@ -134,10 +134,10 @@ def sortFile(fileobj):
 
 #
 # sort each of the specified files
-filefrom = createFileObj("from", sys.argv[2])
-sortFile(filefrom)
-fileto = createFileObj("to", sys.argv[3])
-sortFile(fileto)
+filefrom = create_file_obj("from", sys.argv[2])
+sort_file(filefrom)
+fileto = create_file_obj("to", sys.argv[3])
+sort_file(fileto)
 
 #
 # invoke the requested diff command to compare the two sorted files
